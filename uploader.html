@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <script>
+      // Prevent forms from submitting.
+      function preventFormSubmit() {
+        var forms = document.querySelectorAll('form');
+        for (var i = 0; i < forms.length; i++) {
+          forms[i].addEventListener('submit', function(event) {
+            event.preventDefault();
+          });
+        }
+      }
+      window.addEventListener('load', preventFormSubmit);
+
+      function handleFormSubmit(formObject) {
+        google.script.run.withSuccessHandler(updateUrl).processForm(formObject);
+      }
+      function updateUrl(url) {
+        if (url){
+          var div = document.getElementById('output');
+          div.innerHTML = '<a href="' + url + '">Got it!</a>';
+        }
+      }
+    </script>
+  </head>
+  <body>
+  <script type="text/javascript">
+  if (navigator.geolocation) {
+
+    // 現在の位置情報を取得
+    navigator.geolocation.getCurrentPosition(
+
+      // （1）位置情報の取得に成功した場合
+      function (pos) {
+        var latitude =　pos.coords.latitude; //緯度
+        var slope = pos.coords.longitude; //傾度
+        document.getElementById("location").innerHTML = 'lat='+ latitude + 'slope=' + slope;
+      },
+      // （2）位置情報の取得に失敗した場合
+      function (error) {
+        var message = "";
+
+        switch (error.code) {
+
+          // 位置情報が取得できない場合
+          case error.POSITION_UNAVAILABLE:
+            message = "位置情報の取得ができませんでした。";
+            break;
+
+          // Geolocationの使用が許可されない場合
+          case error.PERMISSION_DENIED:
+            message = "位置情報取得の使用許可がされませんでした。";
+            break;
+
+          // タイムアウトした場合
+          case error.PERMISSION_DENIED_TIMEOUT:
+            message = "位置情報取得中にタイムアウトしました。";
+            break;
+        }
+        window.alert(message);
+      }
+    );
+  } else {
+    window.alert("本ブラウザではGeolocationが使えません");
+  }
+</script>
+
+<p id="location"></p>
+  
+    <form id="myForm" onsubmit="handleFormSubmit(this)">
+      <input name="myFile" type="file" /><br><br>
+      <textarea name="myText"></textarea>
+      <input type="submit" value="Submit" />
+    </form>
+    <div id="output"></div>
+ </body>
+</html>

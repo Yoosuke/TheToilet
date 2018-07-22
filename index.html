@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+  <script type="text/javascript">
+  if (navigator.geolocation) {
+
+    // 現在の位置情報を取得
+    navigator.geolocation.getCurrentPosition(
+
+      // （1）位置情報の取得に成功した場合
+      function (pos) {
+        var lat =　pos.coords.latitude; //緯度
+        var lng = pos.coords.longitude; //傾度
+        google.script.run.withSuccessHandler(setLatLng).setLatLng(lat,lng);
+        //document.getElementById("location").innerHTML = latitude;
+      },
+      // （2）位置情報の取得に失敗した場合
+      function (error) {
+        var message = "";
+
+        switch (error.code) {
+
+          // 位置情報が取得できない場合
+          case error.POSITION_UNAVAILABLE:
+            message = "位置情報の取得ができませんでした。";
+            break;
+
+          // Geolocationの使用が許可されない場合
+          case error.PERMISSION_DENIED:
+            message = "位置情報取得の使用許可がされませんでした。";
+            break;
+
+          // タイムアウトした場合
+          case error.PERMISSION_DENIED_TIMEOUT:
+            message = "位置情報取得中にタイムアウトしました。";
+            break;
+        }
+        window.alert(message);
+      }
+    );
+  } else {
+    window.alert("本ブラウザではGeolocationが使えません");
+  }
+  /*緯度・経度をスプレッドシートに登録*/
+  function setLatLng(lat,lng){
+  
+      google.script.run.withSuccessHandler(setLatLngSheet).setLatLngSheet(lat,lng);
+  
+  }
+</script>  
+  
+  Hello Wolrd!
+    <a href="https://script.google.com/a/thewaggle.co.jp/macros/s/AKfycbxicrHjb3qrTe8H_MAuO0miUmzqWl-psFOPYQAZEblKs3qqdGpO/exec?page=map">map</a>
+    <a href="https://script.google.com/a/thewaggle.co.jp/macros/s/AKfycbxicrHjb3qrTe8H_MAuO0miUmzqWl-psFOPYQAZEblKs3qqdGpO/exec?page=uploader">uploader</a>    
+  </body>
+</html>
+
+
