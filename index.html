@@ -1,61 +1,149 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-  <head>
-    <base target="_top">
-  </head>
-  <body>
-  <script type="text/javascript">
-  if (navigator.geolocation) {
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<link rel="stylesheet" type="text/css" href="https://js.cit.api.here.com/v3/3.0/mapsjs-ui.css?dp-version=1526040296" />
+<script type="text/javascript" src="https://js.cit.api.here.com/v3/3.0/mapsjs-core.js"></script>
+<script type="text/javascript" src="https://js.cit.api.here.com/v3/3.0/mapsjs-service.js"></script>
+<script type="text/javascript" src="https://js.cit.api.here.com/v3/3.0/mapsjs-ui.js"></script>
+<script type="text/javascript" src="https://js.cit.api.here.com/v3/3.0/mapsjs-mapevents.js"></script>
 
-    // 現在の位置情報を取得
-    navigator.geolocation.getCurrentPosition(
-
-      // （1）位置情報の取得に成功した場合
-      function (pos) {
-        var lat =　pos.coords.latitude; //緯度
-        var lng = pos.coords.longitude; //傾度
-        google.script.run.withSuccessHandler(setLatLng).setLatLng(lat,lng);
-        //document.getElementById("location").innerHTML = latitude;
-      },
-      // （2）位置情報の取得に失敗した場合
-      function (error) {
-        var message = "";
-
-        switch (error.code) {
-
-          // 位置情報が取得できない場合
-          case error.POSITION_UNAVAILABLE:
-            message = "位置情報の取得ができませんでした。";
-            break;
-
-          // Geolocationの使用が許可されない場合
-          case error.PERMISSION_DENIED:
-            message = "位置情報取得の使用許可がされませんでした。";
-            break;
-
-          // タイムアウトした場合
-          case error.PERMISSION_DENIED_TIMEOUT:
-            message = "位置情報取得中にタイムアウトしました。";
-            break;
-        }
-        window.alert(message);
-      }
-    );
-  } else {
-    window.alert("本ブラウザではGeolocationが使えません");
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+<link href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css" rel="stylesheet" type="text/css">
+<link href="material.min.css" rel="stylesheet" type="text/css">
+<link href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css" rel="stylesheet" type="text/css">
+<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+<?!= include('css') ?>
+  <style>
+  #view-source {
+    position: fixed;
+    display: block;
+    right: 0;
+     bottom: 0;
+    margin-right: 40px;
+    margin-bottom: 40px;
+    z-index: 900;
   }
-  /*緯度・経度をスプレッドシートに登録*/
-  function setLatLng(lat,lng){
-  
-      google.script.run.withSuccessHandler(setLatLngSheet).setLatLngSheet(lat,lng);
-  
+
+  #fixed {
+  position: fixed;
+  top: 84%;
+  left: 0;
+  margin: 0;
+  width: 100%;
+  height: 10%;
   }
-</script>  
-  
-  Hello Wolrd!
-    <a href="https://script.google.com/a/thewaggle.co.jp/macros/s/AKfycbxicrHjb3qrTe8H_MAuO0miUmzqWl-psFOPYQAZEblKs3qqdGpO/exec?page=map">map</a>
-    <a href="https://script.google.com/a/thewaggle.co.jp/macros/s/AKfycbxicrHjb3qrTe8H_MAuO0miUmzqWl-psFOPYQAZEblKs3qqdGpO/exec?page=uploader">uploader</a>    
+  </style>
+</head>
+<body>
+
+    <div class="demo-layout mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">
+
+      <header class="demo-header mdl-layout__header mdl-layout__header--scroll mdl-color--grey-100 mdl-color-text--grey-800">
+        <div class="mdl-layout__header-row" style="background-color:#03A9F4;">
+          <img src="https://drive.google.com/uc?id=1ntJ3QaVQ6P2kugdGx8dUYx7r3LU6DjQt" >
+          <span class="mdl-layout-title" style="margin-left:20px; color:white; font-size:32px;">150m</span>
+          <div class="mdl-layout-spacer"></div>
+        </div>
+      </header>
+
+      <div class="demo-ribbon"></div>
+      <main class="demo-main mdl-layout__content">
+        <div class="demo-container mdl-grid">
+          <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
+          <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
+
+<div id="map" style="width: 100%; height: 400px; background: grey" />
+<script  type="text/javascript" charset="UTF-8" >
+function addDraggableMarker(map, behavior){
+
+var marker = new H.map.Marker({lat:22.81851, lng:120.2243});
+// Ensure that the marker can receive drag events
+marker.draggable = true;
+map.addObject(marker);
+
+// disable the default draggability of the underlying map
+// when starting to drag a marker object:
+map.addEventListener('dragstart', function(ev) {
+  var target = ev.target;
+  if (target instanceof H.map.Marker) {
+    behavior.disable();
+  }
+}, false);
+
+
+// re-enable the default draggability of the underlying map
+// when dragging has completed
+map.addEventListener('dragend', function(ev) {
+  var target = ev.target;
+  if (target instanceof mapsjs.map.Marker) {
+    behavior.enable();
+  }
+}, false);
+
+// Listen to the drag event and move the position of the marker
+// as necessary
+ map.addEventListener('drag', function(ev) {
+  var target = ev.target,
+      pointer = ev.currentPointer;
+  if (target instanceof mapsjs.map.Marker) {
+    target.setPosition(map.screenToGeo(pointer.viewportX, pointer.viewportY));
+  }
+}, false);
+}
+
+/**
+* Boilerplate map initialization code starts below:
+*/
+
+//Step 1: initialize communication with the platform
+var platform = new H.service.Platform({
+  app_id: 'X3zNeuW2mJ2IEpdlQ9YD',
+  app_code: 'rkgr9rx8Od6cegyFL1QSFg',
+  useCIT: true,
+  useHTTPS: true
+});
+var pixelRatio = window.devicePixelRatio || 1;
+var defaultLayers = platform.createDefaultLayers({
+tileSize: pixelRatio === 1 ? 256 : 512,
+ppi: pixelRatio === 1 ? undefined : 320
+});
+
+//Step 2: initialize a map - this map is centered over Boston
+var map = new H.Map(document.getElementById('map'),
+defaultLayers.normal.map,{
+center: {lat:22.81851, lng:120.2243},
+zoom: 18,
+pixelRatio: pixelRatio
+});
+
+//Step 3: make the map interactive
+// MapEvents enables the event system
+// Behavior implements default interactions for pan/zoom (also on mobile touch environments)
+var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+// Step 4: Create the default UI:
+var ui = H.ui.UI.createDefault(map, defaultLayers, 'en-US');
+
+// Add the click event listener.
+addDraggableMarker(map, behavior);
+</script>
+
+          </div>
+        </div>
+        <footer id="fixed" class="demo-footer mdl-mini-footer" style="background-color:white;">
+          <div class="mdl-mini-footer--left-section">
+            <ul class="mdl-mini-footer--link-list">
+              <li style="color:#1E2529; font-size:32px; margin-top:13px;">3分</li>
+              <li style="font-size:20px; margin:20px;">230m・14:23</li>
+            </ul>
+          </div>
+        </footer>
+      </main>
+    </div>
+
   </body>
 </html>
-
-
